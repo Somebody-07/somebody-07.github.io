@@ -313,11 +313,7 @@
   .gallery-cell:hover { background:#ddd7ce; }
   .gallery-cell img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s; }
   .gallery-cell:hover img { transform:scale(1.05); }
-  .gallery-cell img,
-  .strip-item img,
-  .proj-img {
-    cursor: zoom-in;
-  }
+  .gallery-cell img { cursor: zoom-in; }
   .image-lightbox {
     position: fixed; inset: 0; z-index: 100000;
     display: flex; align-items: center; justify-content: center;
@@ -773,7 +769,6 @@
     });
   }
 
-  const lightboxImages = document.querySelectorAll('.strip-item img, .proj-card .proj-img, .gallery-cell img');
   const lightbox = document.getElementById('stripLightbox');
   const lightboxImage = document.getElementById('lightboxImage');
   const lightboxCaption = document.getElementById('lightboxCaption');
@@ -784,16 +779,67 @@
     document.body.style.overflow = '';
   };
 
-  lightboxImages.forEach(img => {
-    img.addEventListener('click', () => {
-      lightboxImage.src = img.src;
-      lightboxImage.alt = img.alt;
-      lightboxCaption.textContent = img.nextElementSibling?.textContent || img.alt;
-      lightbox.classList.add('open');
-      document.body.style.overflow = 'hidden';
+  const openLightbox = (src, alt = '', caption = '') => {
+    if (!src) return;
+    lightboxImage.src = src;
+    lightboxImage.alt = alt;
+    lightboxCaption.textContent = caption || '';
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const parseSrcFromCode = (text) => {
+    if (!text) return null;
+    const m = text.match(/src\s*=\s*"([^"]+)"/i);
+    return m ? m[1] : null;
+  };
+
+  const getSrcAndCaption = (el) => {
+    // direct img inside element
+    const img = el.querySelector('img');
+    if (img && img.src) return { src: img.src, alt: img.alt || '', caption: el.querySelector('.strip-caption')?.textContent?.trim() || img.alt || '' };
+
+    // caption sibling (strip items)
+    const nextCap = el.querySelector('.strip-caption');
+    if (nextCap && nextCap.previousElementSibling?.tagName === 'IMG') {
+      const siblingImg = nextCap.previousElementSibling;
+      return { src: siblingImg.src, alt: siblingImg.alt || '', caption: nextCap.textContent.trim() };
+    }
+
+    // gallery or project placeholder code blocks
+    const code = el.querySelector('.gc-code')?.textContent || el.querySelector('.ph-code')?.textContent || '';
+    const parsed = parseSrcFromCode(code);
+    if (parsed) return { src: parsed, alt: '', caption: el.querySelector('.gc-lbl')?.textContent?.trim() || el.querySelector('.ph-num')?.textContent?.trim() || '' };
+
+    // try finding proj-img in parent proj-card
+    const projImg = el.closest('.proj-card')?.querySelector('.proj-img');
+    if (projImg && projImg.src) return { src: projImg.src, alt: projImg.alt || '', caption: el.closest('.proj-card')?.querySelector('.proj-name')?.textContent?.trim() || projImg.alt || '' };
+
+    return null;
+  };
+
+  const clickTargets = document.querySelectorAll('.strip-item, .strip-item img, .gallery-row .gallery-cell, .gallery-row img, .proj-card, .proj-ph, .proj-img');
+  clickTargets.forEach(el => { if (el.tagName === 'IMG') el.style.cursor = 'zoom-in'; else el.style.cursor = 'pointer'; });
+
+  clickTargets.forEach(target => {
+    let downX = 0, downY = 0, moved = false;
+    target.addEventListener('pointerdown', e => {
+      downX = e.clientX; downY = e.clientY; moved = false;
+      try { target.setPointerCapture?.(e.pointerId); } catch (err) {}
+    });
+    target.addEventListener('pointermove', e => {
+      if (downX === 0 && downY === 0) return;
+      if (Math.hypot(e.clientX - downX, e.clientY - downY) > 6) moved = true;
+    });
+    target.addEventListener('pointerup', e => {
+      if (moved) { downX = downY = 0; return; }
+      const info = getSrcAndCaption(target);
+      if (info && info.src) {
+        openLightbox(info.src, info.alt, info.caption);
+      }
+      downX = downY = 0;
     });
   });
-
   lightboxClose.addEventListener('click', closeLightbox);
   lightbox.addEventListener('click', e => {
     if (e.target === lightbox) closeLightbox();
@@ -809,17 +855,40 @@
   }, { threshold: 0.07 });
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-  // Drag-to-scroll
+  // Pointer drag removed — only wheel/trackpad scrolling remains
   function draggable(el) {
-    let down=false, startX, sl;
-    el.addEventListener('mousedown', e => { down=true; startX=e.pageX-el.offsetLeft; sl=el.scrollLeft; });
-    el.addEventListener('mouseleave', ()=>down=false);
-    el.addEventListener('mouseup',   ()=>down=false);
-    el.addEventListener('mousemove', e => {
-      if (!down) return; e.preventDefault();
-      el.scrollLeft = sl - (e.pageX - el.offsetLeft - startX) * 1.5;
-    });
+    // show grab cursor to indicate horizontal scrolling
+    el.style.cursor = 'grab';
+
+    let wheelV = 0;
+    let wheelRafId = null;
+
+    el.addEventListener('wheel', e => {
+      // allow horizontal wheel gestures through
+      if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+      e.preventDefault();
+
+      // accumulate gently for smoother, less abrupt motion
+      wheelV += e.deltaY * 0.12;
+
+      if (wheelRafId) return;
+
+      const WHEEL_FRICTION = 0.96;
+      const MIN_V = 0.2;
+      const step = () => {
+        el.scrollLeft += wheelV;
+        wheelV *= WHEEL_FRICTION;
+        if (Math.abs(wheelV) > MIN_V) {
+          wheelRafId = requestAnimationFrame(step);
+        } else {
+          wheelV = 0;
+          wheelRafId = null;
+        }
+      };
+      wheelRafId = requestAnimationFrame(step);
+    }, { passive: false });
   }
+
   draggable(document.getElementById('strip1'));
   draggable(document.getElementById('gallery-row'));
   // Toggle nav link color when hero is in view
