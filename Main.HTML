@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Yundi Fei — Engineering Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f2ede6;
+    --cream2: #e8e2d9;
+    --dark: #141210;
+    --dark2: #1e1a16;
+    --lime: #c8f04a;
+    --lime2: #9bbf2a;
+    --mid: #6b6560;
+    --border: #d4cec6;
+    --serif: 'Playfair Display', Georgia, serif;
+    --cond: 'Barlow Condensed', sans-serif;
+    --body: 'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--dark);
+    font-family: var(--body);
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR */
+  .cursor {
+    position: fixed; width: 10px; height: 10px;
+    background: var(--lime); border-radius: 50%;
+    pointer-events: none; z-index: 100000;
+    transform: translate(-50%,-50%);
+    mix-blend-mode: normal;
+  }
+  .cursor-ring {
+    position: fixed; width: 36px; height: 36px;
+    border: 1.5px solid var(--dark); border-radius: 50%;
+    pointer-events: none; z-index: 99999;
+    transform: translate(-50%,-50%);
+    transition: width 0.25s, height 0.25s, border-color 0.2s;
+    mix-blend-mode: normal;
+  }
+  .cursor-ring.footer-hover {
+    border-color: #ffffff;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.5rem 3rem;
+  }
+  .nav-logo {
+    font-family: var(--cond); font-weight: 900; font-size: 1.1rem;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--dark);
+    text-decoration: none;
+  }
+  nav ul { list-style: none; display: flex; gap: 2.5rem; }
+  nav a {
+    font-family: var(--cond); font-weight: 600; font-size: 0.78rem;
+    letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none;
+    color: var(--dark); transition: color 0.2s;
+  }
+  nav a:hover { color: var(--mid); }
+  /* When hero background is visible, make nav links white; otherwise default dark */
+  nav.nav-on-hero a, nav.nav-on-hero .nav-logo { color: #fff !important; }
+  nav.nav-on-hero a:hover { color: #ffffffcc; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: flex-end; padding: 0 3rem 3.5rem;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg { position: absolute; inset: 0; z-index: 0; }
+
+  /* ═══════════════════════════════════════════════════
+     PHOTO SLOT 1 — HERO BACKGROUND
+     Change .hero-bg-inner style to:
+     background: url('hero.jpg') center top / cover no-repeat;
+     ═══════════════════════════════════════════════════ */
+  .hero-bg-inner {
+    width: 100%; height: 100%;
+    background: url('assets/Front.png') center 0px / cover no-repeat;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-bg-inner .ph-hint {
+    font-family: var(--cond); font-size: 0.7rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: rgba(20,18,16,0.3); text-align: center;
+    line-height: 2.2; background: rgba(242,237,230,0.55);
+    padding: 1.2rem 2rem; border: 1px dashed rgba(20,18,16,0.15);
+  }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, var(--cream) 0%, rgba(242,237,230,0.2) 50%, transparent 100%);
+    z-index: 1;
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-tag {
+    font-family: var(--cond); font-weight: 600; font-size: 0.78rem;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--mid);
+    margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.7rem;
+  }
+  .hero-tag::before {
+    content:''; display:inline-block; width:28px; height:2px; background:var(--lime);
+  }
+  .hero-name {
+    font-family: var(--serif); font-size: clamp(5rem, 12vw, 13rem);
+    font-weight: 900; line-height: 0.86; letter-spacing: -0.02em; margin-bottom: 1rem;
+  }
+  .hero-name .first { display: block; }
+  .hero-name .last  { display: block; font-style: italic; }
+
+  .hero-bottom {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+  }
+  .hero-desc {
+    font-family: var(--cond); font-weight: 400; font-size: 1rem;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--mid);
+    max-width: 400px; line-height: 1.6;
+  }
+  .hero-avail {
+    font-family: var(--cond); font-weight: 700; font-size: 0.75rem;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .avail-dot {
+    width: 8px; height: 8px; background: var(--lime); border-radius: 50%;
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+
+  /* SCROLL STRIP */
+  .scroll-strip { overflow: hidden; padding: 4rem 0 3rem; border-top: 1px solid var(--border); }
+  .strip-label {
+    font-family: var(--cond); font-weight: 600; font-size: 0.72rem;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--mid);
+    padding: 0 3rem; margin-bottom: 1.5rem;
+  }
+  .strip-track {
+    display: flex; gap: 10px; padding: 0 3rem;
+    overflow-x: auto; scrollbar-width: none; cursor: grab;
+    -webkit-overflow-scrolling: touch;
+  }
+  .strip-track:active { cursor: grabbing; }
+  .strip-track::-webkit-scrollbar { display: none; }
+  .strip-item { flex-shrink: 0; position: relative; overflow: hidden; }
+  .strip-item.tall  { width: 270px; height: 370px; }
+  .strip-item.wide  { width: 460px; height: 310px; }
+  .strip-item.sq    { width: 310px; height: 310px; }
+
+  .strip-item img {
+    width:100%; height:100%; object-fit:cover; display:block;
+    transition: transform 0.5s ease;
+  }
+  .strip-item:hover img { transform: scale(1.04); }
+
+  /* ════ PHOTO STRIP PLACEHOLDER ════ */
+  .strip-ph {
+    width:100%; height:100%; background:var(--cream2); border:1px solid var(--border);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:0.5rem; transition: background 0.2s;
+  }
+  .strip-item:hover .strip-ph { background: #ddd7ce; }
+  .strip-ph-num {
+    font-family:var(--serif); font-size:2.8rem; font-weight:900; font-style:italic;
+    color:var(--border); line-height:1;
+  }
+  .strip-ph-label {
+    font-family:var(--cond); font-size:0.62rem; letter-spacing:0.15em;
+    text-transform:uppercase; color:var(--mid); text-align:center; line-height:1.9;
+  }
+  .strip-ph-code {
+    font-family:var(--cond); font-size:0.6rem; letter-spacing:0.06em;
+    color:var(--lime); background:var(--dark); padding:0.25rem 0.6rem; margin-top:0.3rem;
+  }
+  .strip-caption {
+    position:absolute; bottom:0.8rem; left:0.8rem;
+    font-family:var(--cond); font-weight:600; font-size:0.63rem;
+    letter-spacing:0.14em; text-transform:uppercase;
+    color:#fff; background:rgba(20,18,16,0.55); padding:0.25rem 0.5rem;
+    backdrop-filter:blur(4px);
+  }
+
+  /* QUOTE BAND */
+  .quote-band {
+    padding: 5.5rem 3rem; border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: 70px 1fr; gap: 2rem; align-items: start;
+  }
+  .quote-mark {
+    font-family:var(--serif); font-size:7rem; font-style:italic;
+    color:var(--lime); line-height:0.7; padding-top:0.4rem;
+  }
+  .quote-text {
+    font-family:var(--serif); font-size:clamp(1.6rem,3vw,2.9rem);
+    font-style:italic; font-weight:700; line-height:1.22; max-width:820px;
+  }
+  .quote-attr {
+    font-family:var(--cond); font-weight:600; font-size:0.72rem;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--mid); margin-top:1.5rem;
+  }
+
+  /* BIG SECTION HEADER */
+  .big-header {
+    padding: 5rem 3rem 2rem;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+  .big-header h2 {
+    font-family:var(--cond); font-weight:900;
+    font-size:clamp(4rem,9vw,9.5rem); line-height:0.84;
+    text-transform:uppercase; letter-spacing:-0.02em;
+  }
+  .big-header h2 em {
+    font-style:italic; font-family:var(--serif);
+    text-transform:none; font-size:0.88em;
+  }
+  .big-header-sub {
+    font-family:var(--body); font-weight:300; font-size:0.95rem;
+    color:var(--mid); max-width:300px; line-height:1.65;
+    text-align:right; padding-bottom:0.4rem;
+  }
+
+  /* EXPERIENCE */
+  .exp-section { padding: 0 3rem 6rem; }
+  .exp-row {
+    display:grid; grid-template-columns:1fr 150px 180px; gap:0;
+    padding:2.2rem 0; border-top:1px solid var(--border); align-items:start;
+    transition: background 0.2s, padding 0.2s;
+    cursor: default;
+  }
+  .exp-row:last-child { border-bottom: 1px solid var(--border); }
+  .exp-row:hover { background:var(--cream2); padding:2.2rem 1.5rem; margin:0 -1.5rem; }
+  .exp-role {
+    font-family:var(--serif); font-size:1.45rem; font-weight:700; margin-bottom:0.3rem; line-height:1.15;
+  }
+  .exp-org {
+    font-family:var(--cond); font-weight:700; font-size:0.7rem;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--lime2); margin-bottom:0.8rem;
+  }
+  .exp-bullets { list-style:none; display:flex; flex-direction:column; gap:0.45rem; }
+  .exp-bullets li {
+    font-size:0.85rem; color:var(--mid); padding-left:1rem; position:relative; line-height:1.55;
+  }
+  .exp-bullets li::before { content:'—'; position:absolute; left:0; color:var(--lime2); font-size:0.75rem; }
+  .exp-date-col {
+    font-family:var(--cond); font-weight:600; font-size:0.7rem;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--mid); padding-top:0.3rem;
+  }
+  .exp-loc-col {
+    font-family:var(--cond); font-size:0.7rem; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--mid); padding-top:0.3rem; text-align:right;
+  }
+
+  /* PROJECTS */
+  .proj-section { padding: 0 3rem 6rem; }
+  .proj-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border); }
+  .proj-card { background:var(--cream); overflow:hidden; transition:background 0.2s; }
+  .proj-card:hover { background:var(--cream2); }
+
+  /* ════ PROJECT PHOTO PLACEHOLDER ════ */
+  .proj-ph {
+    width:100%; height:280px; background:var(--cream2);
+    border-bottom:1px solid var(--border);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.4rem;
+  }
+  .proj-ph .ph-num { font-family:var(--serif); font-style:italic; font-size:3rem; color:var(--border); line-height:1; }
+  .proj-ph span { font-family:var(--cond); font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--mid); }
+  .proj-ph .ph-code { font-family:var(--cond); font-size:0.58rem; color:var(--lime); background:var(--dark); padding:0.2rem 0.5rem; }
+  .proj-img { width:100%; height:280px; object-fit:cover; display:block; }
+  .proj-img.shift-down { object-position: center -30px; }
+  .proj-ph.large { height:330px; }
+  .proj-img.large { height:330px; }
+
+  .proj-body { padding: 2rem; }
+  .proj-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.8rem; }
+  .ptag {
+    font-family:var(--cond); font-weight:700; font-size:0.6rem;
+    letter-spacing:0.14em; text-transform:uppercase;
+    border:1px solid var(--border); padding:0.2rem 0.55rem; color:var(--mid);
+  }
+  .proj-name { font-family:var(--serif); font-size:1.6rem; font-weight:700; font-style:italic; margin-bottom:0.6rem; }
+  .proj-desc { font-size:0.85rem; color:var(--mid); line-height:1.65; }
+
+  /* GALLERY */
+  .gallery-section { border-top:1px solid var(--border); padding:4rem 0; }
+  .gallery-label {
+    font-family:var(--cond); font-weight:600; font-size:0.72rem;
+    letter-spacing:0.2em; text-transform:uppercase; color:var(--mid); padding:0 3rem; margin-bottom:1.5rem;
+  }
+  .gallery-row {
+    display:flex; gap:4px; padding:0 3rem;
+    overflow-x:auto; scrollbar-width:none; cursor:grab;
+  }
+  .gallery-row:active { cursor:grabbing; }
+  .gallery-row::-webkit-scrollbar { display:none; }
+  .gallery-cell {
+    flex-shrink:0; width:240px; height:300px; overflow:hidden;
+    background:var(--cream2); border:1px dashed var(--border);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.4rem;
+    transition: background 0.2s;
+  }
+  .gallery-cell:hover { background:#ddd7ce; }
+  .gallery-cell img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s; }
+  .gallery-cell:hover img { transform:scale(1.05); }
+  .gallery-cell img { cursor: zoom-in; }
+  .image-lightbox {
+    position: fixed; inset: 0; z-index: 100000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem; background: rgba(20,18,16,0.92);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+  .image-lightbox.open {
+    opacity: 1; visibility: visible; pointer-events: auto;
+  }
+  .lightbox-content {
+    position: relative; width: min(95vw, 1000px); max-height: 95vh;
+    display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  }
+  .lightbox-content img {
+    width: 100%; height: auto; max-height: calc(100vh - 120px);
+    object-fit: contain; border-radius: 0.75rem; box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  .lightbox-caption {
+    color: #fff; font-size: 0.95rem; text-align: center; max-width: 90vw;
+  }
+  .lightbox-close {
+    position: absolute; top: -0.8rem; right: -0.8rem;
+    width: 2.8rem; height: 2.8rem; border: none; border-radius: 50%;
+    background: rgba(255,255,255,0.16); color: #fff;
+    font-size: 1.5rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .gc-num { font-family:var(--serif); font-style:italic; font-size:2rem; color:var(--border); }
+  .gc-lbl { font-family:var(--cond); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--mid); text-align:center; line-height:1.9; }
+  .gc-code { font-family:var(--cond); font-size:0.58rem; color:var(--lime); background:var(--dark); padding:0.2rem 0.5rem; }
+
+  /* SKILLS */
+  .skills-section { padding: 0 3rem 6rem; }
+  .skills-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); }
+  .skill-group { background:var(--cream); padding:2.5rem; transition:background 0.2s; }
+  .skill-group:hover { background:var(--cream2); }
+  .sg-title {
+    font-family:var(--cond); font-weight:900; font-size:0.72rem;
+    letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1.4rem;
+    padding-bottom:0.7rem; border-bottom:2.5px solid var(--lime); display:inline-block;
+  }
+  .sg-items { display:flex; flex-wrap:wrap; gap:0.5rem; }
+  .sg-chip {
+    font-family:var(--cond); font-weight:600; font-size:0.8rem;
+    letter-spacing:0.06em; text-transform:uppercase;
+    background:var(--cream2); border:1px solid var(--border); padding:0.35rem 0.75rem;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top:2px solid var(--dark); padding:4rem 3rem 3rem;
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:2rem;
+    background:var(--dark); color:var(--cream);
+  }
+  .footer-name { font-family:var(--serif); font-size:2.5rem; font-style:italic; font-weight:900; line-height:1; margin-bottom:0.4rem; }
+  .footer-title { font-family:var(--cond); font-weight:600; font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:#666; }
+  .footer-col-label { font-family:var(--cond); font-weight:700; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:#555; margin-bottom:1rem; }
+  .footer-links { list-style:none; display:flex; flex-direction:column; gap:0.5rem; }
+  .footer-links a { font-family:var(--cond); font-weight:600; font-size:0.85rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--cream); text-decoration:none; transition:color 0.2s; }
+  .footer-links a:hover { color:var(--lime); }
+  .footer-bottom { background:var(--dark); border-top:1px solid #222; padding:1.5rem 3rem; display:flex; justify-content:space-between; }
+  .footer-bottom p { font-family:var(--cond); font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:#444; }
+
+  /* REVEAL */
+  .reveal { opacity:0; transform:translateY(22px); transition:opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity:1; transform:none; }
+
+  /* RESPONSIVE */
+  @media (max-width:800px) {
+    nav { padding:1rem 1.5rem; }
+    nav ul { gap:1rem; }
+    #hero { padding:0 1.5rem 2.5rem; }
+    .hero-name { font-size:clamp(3.5rem,16vw,6rem); }
+    .hero-bottom { flex-direction:column; gap:1rem; align-items:flex-start; }
+    .big-header { flex-direction:column; gap:1rem; padding:3rem 1.5rem 1.5rem; }
+    .big-header-sub { text-align:left; }
+    .exp-section,.proj-section,.skills-section { padding-left:1.5rem; padding-right:1.5rem; }
+    .exp-row { grid-template-columns:1fr; }
+    .exp-loc-col { text-align:left; }
+    .proj-grid { grid-template-columns:1fr; }
+    .skills-grid { grid-template-columns:1fr; }
+    .quote-band { grid-template-columns:1fr; padding:3rem 1.5rem; }
+    .quote-mark { display:none; }
+    footer { grid-template-columns:1fr; padding:3rem 1.5rem 2rem; }
+    .footer-bottom { flex-direction:column; gap:0.4rem; padding:1rem 1.5rem; }
+    .strip-track,.gallery-row { padding:0 1.5rem; }
+    .strip-label,.gallery-label { padding:0 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">YF</a>
+  <ul>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="mailto:y5fei@uwaterloo.ca">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg">
+    <!--
+    ╔══════════════════════════════════════════════════════╗
+    ║  PHOTO SLOT 1 — HERO BACKGROUND                      ║
+    ║  Remove .hero-bg-inner div entirely and replace with ║
+    ║  a CSS background on .hero-bg-inner:                 ║
+    ║    background: url('hero.jpg') center top/cover;     ║
+    ╚══════════════════════════════════════════════════════╝  
+    -->
+    <div class="hero-bg-inner"></div>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-tag">Mechanical Engineering · Composites · Aerodynamics</p>
+    <h1 class="hero-name">
+      <span class="first">Yundi</span>
+      <span class="last">Fei</span>
+    </h1>
+    <div class="hero-bottom">
+      <p class="hero-desc">
+        Nose Cone Manufacturing Lead<br>
+        UW Formula Electric · BASc Mechanical Engineering<br>
+        University of Waterloo, Class of 2030
+      </p>
+      <div class="hero-avail">
+        <span class="avail-dot"></span>
+        Open for co-op — Sept 2026
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHOTO STRIP -->
+<div class="scroll-strip reveal">
+  <p class="strip-label">In the Shop &amp; On the Track — drag to scroll</p>
+  <div class="strip-track" id="strip1">
+    <!--
+    ════════════════════════════════════════════════════════════
+    PHOTO SLOTS 2–7 — HORIZONTAL SCROLL STRIP
+    To add a real photo, replace the .strip-ph div inside any
+    .strip-item with:
+      <img src="YOUR_PHOTO.jpg" alt="Description">
+      <span class="strip-caption">Location, Year</span>
+    ════════════════════════════════════════════════════════════
+    -->
+    <div class="strip-item tall">
+      <img src="assets/spray.jpg" alt="Spray Booth / Paint Process">
+      <span class="strip-caption">Spray Booth, 2026</span>
+    </div>
+    <div class="strip-item wide">
+      <img src="assets/NoseCone1.png" alt="Nose Cone Layup">
+      <span class="strip-caption">Waterloo, 2026</span>
+    </div>
+    <div class="strip-item sq">
+      <img src="assets/WindTunnel.jpg" alt="Wind Tunnel Testing">
+      <span class="strip-caption">Wind Tunnel Testing, 2026</span>
+    </div>
+    <div class="strip-item tall">
+      <img src="assets/rearwing.jpg" alt="Rear Wing Build Session">
+      <span class="strip-caption">Rear Wing Build Session, 2026</span>
+    </div>
+    <div class="strip-item wide">
+      <img src="assets/floor.png" alt="Floor Plan / Undertray Layout">
+      <span class="strip-caption">Floor Plan / Undertray Layout, 2026</span>
+    </div>
+    <div class="strip-item sq">
+      <img src="assets/y250.jpg" alt="Y250 Front Wing Component">
+      <span class="strip-caption">Y250 Front Wing, 2026</span>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE -->
+<div class="quote-band reveal">
+  <div class="quote-mark">"</div>
+  <div>
+    <p class="quote-text">It doesn't matter where you start, it's how you progress from there.</p>
+    <p class="quote-attr">— Mechanical Engineer in the making &nbsp;·&nbsp; Waterloo, ON</p>
+  </div>
+</div>
+
+<!-- EXPERIENCE -->
+<div id="experience">
+  <div class="big-header reveal">
+    <div>
+      <h2>Work &amp;<br><em>Experience</em></h2>
+    </div>
+    <p class="big-header-sub">From composite manufacturing to aerodynamics research — building things that matter.</p>
+  </div>
+  <div class="exp-section">
+
+    <div class="exp-row reveal">
+      <div>
+        <div class="exp-role">Nose Cone Manufacturing Lead</div>
+        <div class="exp-org">University of Waterloo Formula Electric</div>
+        <ul class="exp-bullets">
+          <li>Led vacuum-assisted resin transfer moulding of the 2026 front nose cone, meeting aerodynamic geometry and vehicle integration requirements.</li>
+          <li>Prepared CNC-machined foam moulds through epoxy sealing, surface filling and priming for high-quality laminar composite surfaces.</li>
+          <li>Designed geometry validated through Star CCM+ CFD simulations and wind tunnel testing.</li>
+          <li>Organised and supervised manufacturing sessions — setup, infusion execution and post-cure quality checks.</li>
+        </ul>
+      </div>
+      <div class="exp-date-col">Dec 2025 –<br>Present</div>
+      <div class="exp-loc-col">Waterloo, ON</div>
+    </div>
+
+    <div class="exp-row reveal">
+      <div>
+        <div class="exp-role">Aerodynamics General Member</div>
+        <div class="exp-org">University of Waterloo Formula Electric</div>
+        <ul class="exp-bullets">
+          <li>Vacuum flat panel resin infusions for the 2026 rear wing, increasing efficiency and reducing vortex generation.</li>
+          <li>Manufactured Y-250 front wing carbon-fibre components for R&amp;D, reducing front tire wake by 20%.</li>
+          <li>Fabricated a custom infusion cart mounting fixture using lathe, band saw and belt sander.</li>
+          <li>Created SolidWorks draft drawings for rear wing clevis insert for laser cut and water jet manufacturing.</li>
+        </ul>
+      </div>
+      <div class="exp-date-col">Sept –<br>Dec 2025</div>
+      <div class="exp-loc-col">Waterloo, ON</div>
+    </div>
+
+    <div class="exp-row reveal">
+      <div>
+        <div class="exp-role">Website Editor &amp; Social Media Manager</div>
+        <div class="exp-org">DP Tile and Stone</div>
+        <ul class="exp-bullets">
+          <li>Audited and corrected 500+ website errors in Contentful, improving content consistency and professional presentation.</li>
+          <li>Published 20+ social media posts and produced 10+ short-form marketing videos. Piloted drones to communicate product quality.</li>
+        </ul>
+      </div>
+      <div class="exp-date-col">Jul –<br>Aug 2024</div>
+      <div class="exp-loc-col">Richmond, BC</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<div id="projects">
+  <div class="big-header reveal">
+    <div>
+      <h2>Selected<br><em>Projects</em></h2>
+    </div>
+    <p class="big-header-sub">Hands-on builds from concept through fabrication and delivery.</p>
+  </div>
+  <div class="proj-section">
+    <div class="proj-grid">
+
+      <div class="proj-card reveal">
+        <!--
+          PHOTO SLOT 8 — WIND TUNNEL PROJECT
+          Replace .proj-ph with:
+          <img class="proj-img" src="wind_tunnel_project.jpg" alt="3D Printed Wind Tunnel">
+        -->
+        <div class="proj-ph large">
+          <img class="proj-img shift-down large" src="assets/3Dprint.jpg" alt="3D Printed Wind Tunnel">
+        </div>
+        <div class="proj-body">
+          <div class="proj-tags">
+            <span class="ptag">SolidWorks</span>
+            <span class="ptag">CFD</span>
+            <span class="ptag">3D Printing</span>
+            <span class="ptag">Circuits</span>
+          </div>
+          <div class="proj-name">3D Printed Wind Tunnel</div>
+          <p class="proj-desc">Designed a 3D-printed wind tunnel in SolidWorks based on NASA Glenn Research Center reference designs, achieving a 12:1 contraction ratio. Performed CFD simulations to reduce velocity non-uniformity to under 10% variation. Integrated an ultrasonic mist-based flow visualisation system to analyse boundary layers and flow separation.</p>
+        </div>
+      </div>
+
+      <div class="proj-card reveal">
+        <!--
+          PHOTO SLOT 9 — RC CAR PROJECT
+          Replace .proj-ph with:
+          <img class="proj-img" src="rc_car.jpg" alt="RC Car">
+        -->
+        <div class="proj-ph large">
+          <span class="ph-num">09</span>
+          <span>Slot 9 — RC Car Project</span>
+          <span class="ph-code">src="rc_car.jpg"</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-tags">
+            <span class="ptag">3D Printing</span>
+            <span class="ptag">SolidWorks</span>
+            <span class="ptag">Electronics</span>
+          </div>
+          <div class="proj-name">Remote Controlled Car</div>
+          <p class="proj-desc">Designed a custom structural mounting base in SolidWorks for electrical and control components. Integrated receiver and response PCBs for wireless signal transmission. Implemented an adjustable rack and pinion steering system for fine-tuning.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY -->
+<div id="gallery" class="gallery-section reveal">
+  <p class="gallery-label">Gallery — drag to scroll</p>
+  <div class="gallery-row" id="gallery-row">
+    <!--
+    ═══════════════════════════════════════════════════
+    PHOTO SLOTS 10–15 — GALLERY
+    Replace each .gallery-cell placeholder content with:
+      <img src="YOUR_PHOTO.jpg" alt="Description">
+    ═══════════════════════════════════════════════════
+    -->
+    <div class="gallery-cell"><span class="gc-num">10</span><span class="gc-lbl">Slot 10<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
+    <div class="gallery-cell"><span class="gc-num">11</span><span class="gc-lbl">Slot 11<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
+    <div class="gallery-cell"><span class="gc-num">12</span><span class="gc-lbl">Slot 12<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
+    <div class="gallery-cell"><span class="gc-num">13</span><span class="gc-lbl">Slot 13<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
+    <div class="gallery-cell"><span class="gc-num">14</span><span class="gc-lbl">Slot 14<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
+    <div class="gallery-cell"><span class="gc-num">15</span><span class="gc-lbl">Slot 15<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
+  </div>
+</div>
+
+<div class="image-lightbox" id="stripLightbox" aria-hidden="true">
+  <div class="lightbox-content">
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close image view">×</button>
+    <img id="lightboxImage" src="" alt="" />
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<div id="skills">
+  <div class="big-header reveal">
+    <div>
+      <h2>Skills &amp;<br><em>Toolkit</em></h2>
+    </div>
+    <p class="big-header-sub">Technical skills, certifications and languages across engineering and fabrication.</p>
+  </div>
+  <div class="skills-section">
+    <div class="skills-grid reveal">
+      <div class="skill-group">
+        <div class="sg-title">CAD / Simulation</div>
+        <div class="sg-items">
+          <span class="sg-chip">SolidWorks</span>
+          <span class="sg-chip">Flow Simulation</span>
+          <span class="sg-chip">Star CCM+</span>
+          <span class="sg-chip">Civil 3D</span>
+          <span class="sg-chip">Blender</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="sg-title">Engineering &amp; Fabrication</div>
+        <div class="sg-items">
+          <span class="sg-chip">MATLAB</span>
+          <span class="sg-chip">Composites / VARTM</span>
+          <span class="sg-chip">CNC Machining</span>
+          <span class="sg-chip">Land Surveying</span>
+          <span class="sg-chip">Tortoise SVN</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="sg-title">Certs &amp; Languages</div>
+        <div class="sg-items">
+          <span class="sg-chip">WHMIS 2017</span>
+          <span class="sg-chip">Worker H&S</span>
+          <span class="sg-chip">G2 Licence</span>
+          <span class="sg-chip">RCM Gr. 10 Piano</span>
+          <span class="sg-chip">English</span>
+          <span class="sg-chip">Mandarin</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-name">Yundi Fei</div>
+    <div class="footer-title">Mechanical Engineering · Waterloo</div>
+  </div>
+  <div>
+    <p class="footer-col-label">Contact</p>
+    <ul class="footer-links">
+      <li><a href="tel:778-317-5455">778-317-5455</a></li>
+      <li><a href="mailto:y5fei@uwaterloo.ca">y5fei@uwaterloo.ca</a></li>
+      <li><a href="https://linkedin.com/in/Yundi" target="_blank">LinkedIn ↗</a></li>
+    </ul>
+  </div>
+  <div>
+    <p class="footer-col-label">Available for Co-op</p>
+    <ul class="footer-links">
+      <li><a href="#">Sept 5 – Dec 31, 2026</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <p>© 2026 Yundi Fei. All rights reserved.</p>
+  <p>University of Waterloo · BASc Mechanical Engineering</p>
+</div>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx=0, my=0, rx=0, ry=0;
+
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+  (function animCursor() {
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+    rx += (mx - rx) * 0.14;
+    ry += (my - ry) * 0.14;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animCursor);
+  })();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      if (!ring.classList.contains('footer-hover')) {
+        ring.style.width='54px';
+        ring.style.height='54px';
+        ring.style.borderColor='#c8f04a';
+      }
+    });
+    el.addEventListener('mouseleave', () => {
+      if (!ring.classList.contains('footer-hover')) {
+        ring.style.width='36px';
+        ring.style.height='36px';
+        ring.style.borderColor='#141210';
+      }
+    });
+  });
+
+  const footerEl = document.querySelector('footer');
+  if (footerEl) {
+    footerEl.addEventListener('mouseenter', () => {
+      ring.classList.add('footer-hover');
+      ring.style.width='36px';
+      ring.style.height='36px';
+      ring.style.borderColor='#ffffff';
+    });
+    footerEl.addEventListener('mouseleave', () => {
+      ring.classList.remove('footer-hover');
+      ring.style.width='36px';
+      ring.style.height='36px';
+      ring.style.borderColor='#141210';
+    });
+  }
+
+  const lightbox = document.getElementById('stripLightbox');
+  const lightboxImage = document.getElementById('lightboxImage');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const lightboxClose = document.getElementById('lightboxClose');
+
+  const closeLightbox = () => {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  const openLightbox = (src, alt = '', caption = '') => {
+    if (!src) return;
+    lightboxImage.src = src;
+    lightboxImage.alt = alt;
+    lightboxCaption.textContent = caption || '';
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const parseSrcFromCode = (text) => {
+    if (!text) return null;
+    const m = text.match(/src\s*=\s*"([^"]+)"/i);
+    return m ? m[1] : null;
+  };
+
+  const getSrcAndCaption = (el) => {
+    // direct img inside element
+    const img = el.querySelector('img');
+    if (img && img.src) return { src: img.src, alt: img.alt || '', caption: el.querySelector('.strip-caption')?.textContent?.trim() || img.alt || '' };
+
+    // caption sibling (strip items)
+    const nextCap = el.querySelector('.strip-caption');
+    if (nextCap && nextCap.previousElementSibling?.tagName === 'IMG') {
+      const siblingImg = nextCap.previousElementSibling;
+      return { src: siblingImg.src, alt: siblingImg.alt || '', caption: nextCap.textContent.trim() };
+    }
+
+    // gallery or project placeholder code blocks
+    const code = el.querySelector('.gc-code')?.textContent || el.querySelector('.ph-code')?.textContent || '';
+    const parsed = parseSrcFromCode(code);
+    if (parsed) return { src: parsed, alt: '', caption: el.querySelector('.gc-lbl')?.textContent?.trim() || el.querySelector('.ph-num')?.textContent?.trim() || '' };
+
+    // try finding proj-img in parent proj-card
+    const projImg = el.closest('.proj-card')?.querySelector('.proj-img');
+    if (projImg && projImg.src) return { src: projImg.src, alt: projImg.alt || '', caption: el.closest('.proj-card')?.querySelector('.proj-name')?.textContent?.trim() || projImg.alt || '' };
+
+    return null;
+  };
+
+  const clickTargets = document.querySelectorAll('.strip-item, .strip-item img, .gallery-row .gallery-cell, .gallery-row img, .proj-card, .proj-ph, .proj-img');
+  clickTargets.forEach(el => { if (el.tagName === 'IMG') el.style.cursor = 'zoom-in'; else el.style.cursor = 'pointer'; });
+
+  clickTargets.forEach(target => {
+    let downX = 0, downY = 0, moved = false;
+    target.addEventListener('pointerdown', e => {
+      downX = e.clientX; downY = e.clientY; moved = false;
+      try { target.setPointerCapture?.(e.pointerId); } catch (err) {}
+    });
+    target.addEventListener('pointermove', e => {
+      if (downX === 0 && downY === 0) return;
+      if (Math.hypot(e.clientX - downX, e.clientY - downY) > 6) moved = true;
+    });
+    target.addEventListener('pointerup', e => {
+      if (moved) { downX = downY = 0; return; }
+      const info = getSrcAndCaption(target);
+      if (info && info.src) {
+        openLightbox(info.src, info.alt, info.caption);
+      }
+      downX = downY = 0;
+    });
+  });
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
+  });
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // Pointer drag removed — only wheel/trackpad scrolling remains
+  function draggable(el) {
+    // show grab cursor to indicate horizontal scrolling
+    el.style.cursor = 'grab';
+
+    let wheelV = 0;
+    let wheelRafId = null;
+
+    el.addEventListener('wheel', e => {
+      // allow horizontal wheel gestures through
+      if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+      e.preventDefault();
+
+      // accumulate gently for smoother, less abrupt motion
+      wheelV += e.deltaY * 0.12;
+
+      if (wheelRafId) return;
+
+      const WHEEL_FRICTION = 0.96;
+      const MIN_V = 0.2;
+      const step = () => {
+        el.scrollLeft += wheelV;
+        wheelV *= WHEEL_FRICTION;
+        if (Math.abs(wheelV) > MIN_V) {
+          wheelRafId = requestAnimationFrame(step);
+        } else {
+          wheelV = 0;
+          wheelRafId = null;
+        }
+      };
+      wheelRafId = requestAnimationFrame(step);
+    }, { passive: false });
+  }
+
+  draggable(document.getElementById('strip1'));
+  draggable(document.getElementById('gallery-row'));
+  // Toggle nav link color when hero is in view
+  (function(){
+    const navEl = document.querySelector('nav');
+    const heroEl = document.getElementById('hero');
+    if (!navEl || !heroEl) return;
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) navEl.classList.add('nav-on-hero');
+        else navEl.classList.remove('nav-on-hero');
+      });
+    }, { threshold: 0.15 });
+    io.observe(heroEl);
+  })();
+</script>
+</body>
+</html>
