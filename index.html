@@ -301,19 +301,27 @@
   .gallery-row {
     display:flex; gap:4px; padding:0 3rem;
     overflow-x:auto; scrollbar-width:none; cursor:grab;
+    align-items: flex-start;
   }
   .gallery-row:active { cursor:grabbing; }
   .gallery-row::-webkit-scrollbar { display:none; }
   .gallery-cell {
-    flex-shrink:0; width:240px; height:300px; overflow:hidden;
+    flex: 0 0 auto;
     background:var(--cream2); border:1px dashed var(--border);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.4rem;
-    transition: background 0.2s;
+    display:flex; align-items:center; justify-content:center;
+    padding:6px; transition: background 0.2s; overflow:visible;
   }
   .gallery-cell:hover { background:#ddd7ce; }
-  .gallery-cell img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s; }
-  .gallery-cell:hover img { transform:scale(1.05); }
-  .gallery-cell img { cursor: zoom-in; }
+  .gallery-cell img {
+    display:block; width:auto; height:auto; max-height:380px; max-width:520px;
+    object-fit:contain; transition:transform 0.4s; cursor:zoom-in;
+  }
+  /* Per-image overrides to better fit individual photos */
+  .gallery-cell img.cage { max-height:520px; max-width:380px; }
+  .gallery-cell img.flat { max-width:720px; max-height:420px; }
+  .gallery-cell img.frontpanel { max-height:600px; max-width:420px; }
+  .gallery-cell img.frontwing { max-width:900px; max-height:420px; }
+  .gallery-cell:hover img { transform:scale(1.03); }
   .image-lightbox {
     position: fixed; inset: 0; z-index: 100000;
     display: flex; align-items: center; justify-content: center;
@@ -596,13 +604,10 @@
       <div class="proj-card reveal">
         <!--
           PHOTO SLOT 9 — RC CAR PROJECT
-          Replace .proj-ph with:
-          <img class="proj-img" src="rc_car.jpg" alt="RC Car">
+          Replaced placeholder with actual image: assets/Motor.jpeg
         -->
         <div class="proj-ph large">
-          <span class="ph-num">09</span>
-          <span>Slot 9 — RC Car Project</span>
-          <span class="ph-code">src="rc_car.jpg"</span>
+          <img class="proj-img shift-down large" src="assets/Motor.jpeg" alt="RC Car Motor">
         </div>
         <div class="proj-body">
           <div class="proj-tags">
@@ -610,8 +615,8 @@
             <span class="ptag">SolidWorks</span>
             <span class="ptag">Electronics</span>
           </div>
-          <div class="proj-name">Remote Controlled Car</div>
-          <p class="proj-desc">Designed a custom structural mounting base in SolidWorks for electrical and control components. Integrated receiver and response PCBs for wireless signal transmission. Implemented an adjustable rack and pinion steering system for fine-tuning.</p>
+          <div class="proj-name">DC Motor Design</div>
+          <p class="proj-desc">Designed a custom structural mounting base in SolidWorks for copper windings and commutator. Designed and fabricated a functional DC brushed motor from raw materials, demonstrating understanding of electromagnetic principles and rotational mechanics.</p>
         </div>
       </div>
 
@@ -630,12 +635,12 @@
       <img src="YOUR_PHOTO.jpg" alt="Description">
     ═══════════════════════════════════════════════════
     -->
-    <div class="gallery-cell"><span class="gc-num">10</span><span class="gc-lbl">Slot 10<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
-    <div class="gallery-cell"><span class="gc-num">11</span><span class="gc-lbl">Slot 11<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
-    <div class="gallery-cell"><span class="gc-num">12</span><span class="gc-lbl">Slot 12<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
-    <div class="gallery-cell"><span class="gc-num">13</span><span class="gc-lbl">Slot 13<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
-    <div class="gallery-cell"><span class="gc-num">14</span><span class="gc-lbl">Slot 14<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
-    <div class="gallery-cell"><span class="gc-num">15</span><span class="gc-lbl">Slot 15<br>Your Photo</span><span class="gc-code">src="photo.jpg"</span></div>
+    <div class="gallery-cell"><img src="assets/Render.jpg" alt="Render 45deg"></div>
+    <div class="gallery-cell"><img src="assets/side.png" alt="Side view"></div>
+    <div class="gallery-cell"><img class="cage" src="assets/cage.jpg" alt="Cage"></div>
+    <div class="gallery-cell"><img class="flat" src="assets/flat.jpg" alt="Front wing flat"></div>
+    <div class="gallery-cell"><img class="frontpanel" src="assets/frontpanel.jpg" alt="Front panel"></div>
+    <div class="gallery-cell"><img class="frontwing" src="assets/frontwing.jpg" alt="Front wing"></div>
   </div>
 </div>
 
@@ -661,6 +666,8 @@
         <div class="sg-title">CAD / Simulation</div>
         <div class="sg-items">
           <span class="sg-chip">SolidWorks</span>
+          <span class="sg-chip">MATLAB</span>
+          <span class="sg-chip">C++</span>
           <span class="sg-chip">Flow Simulation</span>
           <span class="sg-chip">Star CCM+</span>
           <span class="sg-chip">Civil 3D</span>
